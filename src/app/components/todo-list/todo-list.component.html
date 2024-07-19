@@ -1,0 +1,6 @@
+<h2>Todo List</h2>
+<input type="text" placeholder="New Todo" [(ngModel)]="newTodo" />
+<button (click)="addTodo()">Add</button>
+<ul>
+  <li>todo <button (click)="removeTodo()">Remove</button></li>
+</ul>

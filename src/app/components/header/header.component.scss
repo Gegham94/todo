@@ -1,0 +1,86 @@
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  padding: 1.2rem;
+  box-shadow: 0px 0px 15px #f07714;
+  background: #f07714;
+  .logo {
+    display: flex;
+    align-items: center;
+    padding: 0.4rem;
+    border-radius: 0.5rem;
+    border: 3px solid #ffff;
+    pointer-events: none;
+    img {
+      fill: #ffff;
+      width: 3rem;
+      height: 3rem;
+    }
+    .title-logo {
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      color: #ffff;
+      font-weight: 500;
+      font-size: 0.8rem;
+    }
+  }
+  .avatar {
+    position: relative;
+    border: 2px solid #ffff;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    cursor: pointer;
+    &:hover {
+      background: #ffff;
+      .avatar-title {
+        color: #f07714;
+      }
+    }
+    .avatar-title {
+      position: absolute;
+      text-transform: uppercase;
+      color: #ffff;
+      font-weight: 600;
+      font-size: 1.8rem;
+      left: 0.8rem;
+      top: 0.7rem;
+      animation: jump 1s infinite;
+    }
+    .logout-button {
+      position: absolute;
+      top: 90%;
+      left: 90%;
+    }
+  }
+  .avatar-mail {
+    font-size: 1.1rem;
+    color: #ffff;
+    font-weight: 600;
+  }
+  .auth {
+    ::ng-deep .btn .p-button {
+      background-color: #ffff !important;
+      border-color: #ffff !important;
+      color: #f07714 !important;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    ::ng-deep .btn .p-button:hover {
+      background-color: darken(#ffff, 15%) !important;
+      border-color: darken(#ffff, 15%) !important;
+    }
+  }
+}
+
+@keyframes jump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}

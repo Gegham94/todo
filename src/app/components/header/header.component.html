@@ -1,0 +1,30 @@
+<div class="content">
+  <ng-container *ngIf="currentUser$ | async as cu; else authModel">
+    <div class="avatar" (click)="toggleLogout()">
+      <div class="avatar-title">{{ cu.email.charAt(0) }}</div>
+      <p-button
+        class="logout-button"
+        *ngIf="showLogout"
+        label="Logout"
+        (onClick)="logout()"
+        severity="contrast"
+      />
+    </div>
+    <div class="avatar-mail">{{ cu.email }}</div>
+  </ng-container>
+  <ng-template #authModel>
+    <div class="logo">
+      <img src="assets/icons/todo-logo.svg" alt="Logo" />
+      <span class="title-logo jump">TODO</span>
+    </div>
+    <div class="auth">
+      <p-button
+        label="Login / Registration"
+        (onClick)="showDialog(true)"
+        [rounded]="true"
+        [ngClass]="'btn'"
+      />
+    </div>
+  </ng-template>
+</div>
+<app-auth [visible]="visible" (visibleChange)="showDialog($event)"></app-auth>
