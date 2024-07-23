@@ -11,7 +11,6 @@
   background-color: rgba(0, 0, 0, 0.6);
   opacity: 0;
   animation: fadeIn 0.3s forwards;
-
   .container {
     max-width: 400px;
     min-width: 320px;
@@ -23,7 +22,6 @@
     text-align: center;
     transform: scale(0.8);
     animation: scaleIn 0.3s forwards;
-
     .title {
       display: flex;
       align-items: center;
@@ -38,7 +36,7 @@
       justify-content: space-between;
       margin-bottom: 20px;
       button {
-        background: #f0f0f0;
+        background: #e4e4e4;
         color: #333;
         padding: 10px;
         margin-top: 10px;
@@ -47,6 +45,11 @@
         border-radius: 5px;
         font-size: 16px;
         cursor: pointer;
+        &:not(.active) {
+          &:hover {
+            background: #c8c8c8;
+          }
+        }
         &.active {
           background: linear-gradient(to right, #f5ae43, #f07714);
           color: white;
@@ -57,10 +60,20 @@
       input {
         width: 100%;
         padding: 10px;
-        margin: 10px 0;
+        margin: 0.7rem 0;
         border: 1px solid #ddd;
         border-radius: 5px;
-        outline-color: #f07714;
+        &.invalid {
+          border: 3px solid red;
+        }
+      }
+      .error-message {
+        color: red;
+        font-size: 0.7rem;
+        margin-top: -0.5rem;
+        margin-left: 0.6rem;
+        text-align: left;
+        animation: fadeIn 0.2s ease-in-out;
       }
       button {
         width: 100%;
@@ -72,6 +85,10 @@
         color: white;
         font-size: 16px;
         cursor: pointer;
+        &.disabled {
+          opacity: 0.5;
+          pointer-events: none;
+        }
       }
     }
   }
@@ -80,12 +97,13 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
-
 @keyframes scaleIn {
   from {
     transform: scale(0.8);

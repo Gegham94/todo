@@ -1,6 +1,47 @@
-<h2>Todo List</h2>
-<input type="text" placeholder="New Todo" [(ngModel)]="newTodo" />
-<button (click)="addTodo()">Add</button>
-<ul>
-  <li>todo <button (click)="removeTodo()">Remove</button></li>
-</ul>
+<div class="container">
+  <div class="header">
+    <h2>TODO</h2>
+    <div class="add-wrapper">
+      <input type="text" placeholder="New Todo" [(ngModel)]="newTodo" />
+      <p-button label="Add" icon="pi pi-plus" (onClick)="addTodo()" [class.disabled]="newTodo.length === 0" />
+    </div>
+  </div>
+  <div class="list-wrapper" *ngIf="todos && todos.length > 0">
+    <div class="list-body">
+      <div class="search-wrapper p-float-label">
+        <input id="search" type="text" [placeholder]="searchPlaceholder" (focus)="searchPlaceholder = ''" [(ngModel)]="searchText" (input)="searchTodos()"/>
+        <label for="search">Search Todo</label>
+      </div>
+      <div class="loader-wrapper">
+        <app-loader *ngIf="isLoading"></app-loader>
+      </div>
+      <ul *ngIf="!isLoading && paginatedTodos.length > 0">
+        <li class="todo-item" *ngFor="let todo of paginatedTodos; let i = index">
+          <input 
+            type="text" 
+            pInputText 
+            [pTooltip]="'Mark <<' + todo.text + '>> as DONE'"
+            (click)="toggleDone(i)"
+            [value]="todo.text"
+            [class.done]="todo.done"
+            tooltipPosition="top" 
+            placeholder="Top" 
+            readonly/>
+          <div class="modify-content">
+            <p-button class="delete" label="Delete" icon="pi pi-trash" (onClick)="removeTodo(i)" />
+            <p-button class="edit" label="Edit" icon="pi pi-pencil" (onClick)="openEditModal(i)" />
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="paginator-wrapper">
+      <p-paginator *ngIf="!isLoading" [rows]="itemsPerPage" [totalRecords]="filteredTodos.length" (onPageChange)="onPageChange($event)"></p-paginator>
+    </div>
+  </div>
+</div>
+<div class="edit-todo-item-wrapper" *ngIf="isEditing" (click)="onClickOutside($event)">
+  <div class="edit-todo-item">
+    <input type="text" [(ngModel)]="editTodoText" />
+    <p-button icon="pi pi-check" [rounded]="true" [outlined]="true" (onClick)="saveEdit()" />
+  </div>
+</div>

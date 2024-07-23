@@ -6,6 +6,7 @@
 html,
 body {
   font-family: "Poppins", sans-serif;
+  height: 100%;
 }
 * {
   box-sizing: border-box;
@@ -190,6 +191,9 @@ button,
 input {
   /* 1 */
   overflow: visible;
+}
+input {
+  outline-color: #f07714;
 }
 
 /**
