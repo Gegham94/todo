@@ -1,9 +1,16 @@
-<div class="container" *ngIf="currentUser$ | async; else emptyModel">
+<app-header></app-header>
+<div class="container" *ngIf="!isFakeLoading && (currentUser$ | async); else emptyModel">
   <app-todo-list></app-todo-list>
 </div>
 <ng-template #emptyModel>
-  <div class="empty-container">
-    <img src="assets/icons/empty-data.svg" alt="empty-data" />
-    <h2>Please Log in to see todo data !</h2>
+  <div class="loader-wrapper" *ngIf="isFakeLoading; else noDataModel">
+    <app-loader></app-loader>
   </div>
+  <ng-template #noDataModel>
+    <div class="empty-container">
+      <img src="assets/icons/empty-data.svg" alt="empty-data" />
+      <h2>Please Log in to see todo data !</h2>
+    </div>
+  </ng-template>
 </ng-template>
+<app-footer></app-footer>

@@ -15,7 +15,7 @@
       <div class="loader-wrapper">
         <app-loader *ngIf="isLoading"></app-loader>
       </div>
-      <ul *ngIf="!isLoading && paginatedTodos.length > 0">
+      <ul *ngIf="!isLoading && paginatedTodos.length > 0" [ngClass]="animationClass">
         <li class="todo-item" *ngFor="let todo of paginatedTodos; let i = index">
           <input 
             type="text" 
@@ -28,14 +28,14 @@
             placeholder="Top" 
             readonly/>
           <div class="modify-content">
-            <p-button class="delete" label="Delete" icon="pi pi-trash" (onClick)="removeTodo(i)" />
+            <p-button class="delete" label="Delete" icon="pi pi-trash" (onClick)="openConfirmDialog(i)" />
             <p-button class="edit" label="Edit" icon="pi pi-pencil" (onClick)="openEditModal(i)" />
           </div>
         </li>
       </ul>
     </div>
-    <div class="paginator-wrapper">
-      <p-paginator *ngIf="!isLoading" [rows]="itemsPerPage" [totalRecords]="filteredTodos.length" (onPageChange)="onPageChange($event)"></p-paginator>
+    <div class="paginator-wrapper" *ngIf="!isLoading && filteredTodos.length > 0">
+      <p-paginator [rows]="itemsPerPage" [totalRecords]="filteredTodos.length" (onPageChange)="onPageChange($event)"></p-paginator>
     </div>
   </div>
 </div>
@@ -43,5 +43,15 @@
   <div class="edit-todo-item">
     <input type="text" [(ngModel)]="editTodoText" />
     <p-button icon="pi pi-check" [rounded]="true" [outlined]="true" (onClick)="saveEdit()" />
+  </div>
+</div>
+
+<div class="confirm-dialog-wrapper" *ngIf="isConfirmDialogOpen">
+  <div class="confirm-dialog">
+    <p>Are you sure you want to delete this todo?</p>
+    <div class="confirm-dialog-buttons">
+      <button (click)="confirmDelete()">Yes</button>
+      <button (click)="closeConfirmDialog()">No</button>
+    </div>
   </div>
 </div>

@@ -1,14 +1,12 @@
 :host {
-  height: 100%;
-  width: 100%;
-}
-.container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 1.2rem;
-  height: inherit;
+  justify-content: space-between;
+  height: 100%;
+  min-width: 600px;
+}
+.container {
+  padding: 1rem;
 }
 .empty-container {
   display: flex;
