@@ -46,7 +46,7 @@
   </div>
 </div>
 
-<div class="confirm-dialog-wrapper" *ngIf="isConfirmDialogOpen">
+<div class="confirm-dialog-wrapper" *ngIf="isConfirmDialogOpen" (click)="onClickOutside($event)">
   <div class="confirm-dialog">
     <p>Are you sure you want to delete this todo?</p>
     <div class="confirm-dialog-buttons">

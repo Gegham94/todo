@@ -27,7 +27,7 @@ export class TodoListComponent {
   newTodo: string = '';
   searchText: string = '';
   searchPlaceholder: string = 'Search Todos';
-  todos: { text: string, done: boolean }[] = [
+  todos: { text: string; done: boolean }[] = [
     { text: 'Doing todo task 1', done: false },
     { text: 'Doing todo task 2', done: false },
     { text: 'Doing todo task 3', done: false },
@@ -108,16 +108,21 @@ export class TodoListComponent {
 
   onClickOutside(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    if (this.isEditing && !target.closest('.edit-todo-item')) {
+    if (
+      (this.isEditing && !target.closest('.edit-todo-item')) ||
+      (this.isConfirmDialogOpen && !target.closest('.confirm-dialog'))
+    ) {
       this.resetEditState();
+      this.closeConfirmDialog();
     }
   }
 
   addTodo() {
     if (this.newTodo.trim()) {
-      this.todos.push({ text: this.newTodo, done: false });
+      this.todos.unshift({ text: this.newTodo, done: false });
       this.newTodo = '';
       this.refreshTodos();
+      this.closeConfirmDialog();
     }
   }
 
@@ -183,6 +188,6 @@ export class TodoListComponent {
       } else {
         this.animationClass = 'slide-in-left';
       }
-    }, 300); // Длительность анимации
+    }, 300);
   }
 }
