@@ -1,40 +1,48 @@
 <div class="container">
   <div class="header">
-    <h2>TODO</h2>
+    <span class="list-title">TODO</span>
     <div class="add-wrapper">
       <input type="text" placeholder="New Todo" [(ngModel)]="newTodo" />
-      <p-button label="Add" icon="pi pi-plus" (onClick)="addTodo()" [class.disabled]="newTodo.length === 0" />
+      <p-button label="Add" icon="pi pi-plus" (onClick)="addNewTodo()" [class.disabled]="newTodo.length === 0" />
     </div>
   </div>
-  <div class="list-wrapper" *ngIf="todos && todos.length > 0">
+  <div class="list-wrapper">
     <div class="list-body">
-      <div class="search-wrapper p-float-label">
+      <div class="search-wrapper p-float-label" *ngIf="paginatedTodos.length > 0">
         <input id="search" type="text" [placeholder]="searchPlaceholder" (focus)="searchPlaceholder = ''" [(ngModel)]="searchText" (input)="searchTodos()"/>
         <label for="search">Search Todo</label>
       </div>
-      <div class="loader-wrapper">
-        <app-loader *ngIf="isLoading"></app-loader>
+      <div class="loader-wrapper" *ngIf="isLoading$ | async; else listModel">
+        <app-loader></app-loader>
       </div>
-      <ul *ngIf="!isLoading && paginatedTodos.length > 0" [ngClass]="animationClass">
-        <li class="todo-item" *ngFor="let todo of paginatedTodos; let i = index">
-          <input 
-            type="text" 
-            pInputText 
-            [pTooltip]="'Mark <<' + todo.text + '>> as DONE'"
-            (click)="toggleDone(i)"
-            [value]="todo.text"
-            [class.done]="todo.done"
-            tooltipPosition="top" 
-            placeholder="Top" 
-            readonly/>
-          <div class="modify-content">
-            <p-button class="delete" label="Delete" icon="pi pi-trash" (onClick)="openConfirmDialog(i)" />
-            <p-button class="edit" label="Edit" icon="pi pi-pencil" (onClick)="openEditModal(i)" />
+      <ng-template #listModel>
+        <ul *ngIf="paginatedTodos.length > 0 ; else emptyListModel" [ngClass]="animationClass">
+          <li class="todo-item" *ngFor="let todo of paginatedTodos; let i = index">
+            <input 
+              type="text" 
+              pInputText 
+              [pTooltip]="setTooltipValue(todo.text)"
+              (click)="toggleDone(todo)"
+              [value]="todo.text"
+              [class.done]="todo.done"
+              tooltipPosition="top" 
+              placeholder="Top" 
+              readonly
+            />
+            <div class="modify-content">
+              <p-button class="delete" label="Delete" icon="pi pi-trash" (onClick)="openConfirmDialog(i)" />
+              <p-button class="edit" label="Edit" icon="pi pi-pencil" (onClick)="openEditModal(i)" />
+            </div>
+          </li>
+        </ul>
+        <ng-template #emptyListModel>
+          <div class="empty-list">
+            <p>There is no any TODO !</p>
           </div>
-        </li>
-      </ul>
+        </ng-template>
+      </ng-template>
     </div>
-    <div class="paginator-wrapper" *ngIf="!isLoading && filteredTodos.length > 0">
+    <div class="paginator-wrapper" *ngIf="!(isLoading$ | async) && ((todos$ | async)?.length ?? 0) > 0">
       <p-paginator [rows]="itemsPerPage" [totalRecords]="filteredTodos.length" (onPageChange)="onPageChange($event)"></p-paginator>
     </div>
   </div>

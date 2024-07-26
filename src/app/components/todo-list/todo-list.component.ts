@@ -1,11 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { Subject, debounceTime } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
 import { PaginatorModule } from 'primeng/paginator';
+import { selectAllTodos } from './state/todo.selectors';
+import { ITodo } from '../../models/todo.interface';
+import { Store } from '@ngrx/store';
+import {
+  addTodo,
+  deleteTodo,
+  loadTodos,
+  updateTodo,
+} from './state/todo.actions';
 
 @Component({
   selector: 'app-todo-list',
@@ -21,68 +30,53 @@ import { PaginatorModule } from 'primeng/paginator';
   templateUrl: './todo-list.component.html',
   styleUrl: './todo-list.component.scss',
 })
-export class TodoListComponent {
-  private searchSubject: Subject<string> = new Subject();
-  animationClass: string = '';
+export class TodoListComponent implements OnInit {
+  todos$ = new BehaviorSubject<ITodo[]>([]);
+  isLoading$ = new BehaviorSubject<boolean>(true);
+  filteredTodos!: ITodo[];
+  paginatedTodos!: ITodo[];
   newTodo: string = '';
   searchText: string = '';
+  animationClass: string = '';
   searchPlaceholder: string = 'Search Todos';
-  todos: { text: string; done: boolean }[] = [
-    { text: 'Doing todo task 1', done: false },
-    { text: 'Doing todo task 2', done: false },
-    { text: 'Doing todo task 3', done: false },
-    { text: 'Doing todo task 4', done: false },
-    { text: 'Doing todo task 5', done: false },
-    { text: 'Doing todo task 6', done: false },
-    { text: 'Doing todo task 7', done: false },
-    { text: 'Doing todo task 8', done: false },
-    { text: 'Doing todo task 9', done: false },
-    { text: 'Doing todo task 10', done: false },
-    { text: 'Doing todo task 11', done: false },
-    { text: 'Doing todo task 12', done: false },
-    { text: 'Doing todo task 13', done: false },
-    { text: 'Doing todo task 14', done: false },
-    { text: 'Doing todo task 15', done: false },
-    { text: 'Doing todo task 16', done: false },
-    { text: 'Doing todo task 17', done: false },
-    { text: 'Doing todo task 18', done: false },
-    { text: 'Doing todo task 19', done: false },
-    { text: 'Doing todo task 20', done: false },
-    { text: 'Doing todo task 21', done: false },
-    { text: 'Doing todo task 22', done: false },
-    { text: 'Doing todo task 23', done: false },
-    { text: 'Doing todo task 24', done: false },
-    { text: 'Doing todo task 25', done: false },
-    { text: 'Doing todo task 26', done: false },
-    { text: 'Doing todo task 27', done: false },
-    { text: 'Doing todo task 28', done: false },
-    { text: 'Doing todo task 29', done: false },
-    { text: 'Doing todo task 30', done: false },
-  ];
-  filteredTodos: { text: string; done: boolean }[] = [...this.todos];
-  paginatedTodos: { text: string; done: boolean }[] = [];
   isEditing: boolean = false;
   editTodoIndex: number | null = null;
   editTodoText: string = '';
-  isLoading: boolean = false;
   previousPage: number = 0;
   currentPage: number = 0;
   itemsPerPage: number = 8;
-
   isConfirmDialogOpen: boolean = false;
   todoIndexToDelete: number | null = null;
 
-  constructor() {
-    this.searchSubject.pipe(debounceTime(400)).subscribe((searchText) => {
-      this.updateFilteredTodos(searchText);
-      this.isLoading = false;
-    });
-    this.updatePaginatedTodos();
+  constructor(private store: Store) {}
+
+  public ngOnInit(): void {
+    this.isLoading$.next(true);
+    this.store.dispatch(loadTodos());
+    this.store.select(selectAllTodos).pipe(
+      tap((todos) => {
+        this.todos$.next(todos);
+        this.updateFilteredTodos();
+      })
+    ).subscribe();
+  }
+
+  addNewTodo() {
+    if (this.newTodo.trim()) {
+      const newTodo: ITodo = {
+        id: this.generateTodoId(),
+        text: this.newTodo,
+        done: false,
+      };
+      this.store.dispatch(addTodo({ todo: newTodo }));
+      this.newTodo = '';
+      this.updateFilteredTodos();
+    }
   }
 
   private updateFilteredTodos(searchText?: string) {
     const text = searchText !== undefined ? searchText : this.searchText;
-    this.filteredTodos = this.todos.filter((todo) =>
+    this.filteredTodos = this.todos$.value.filter((todo) =>
       todo.text.toLowerCase().includes(text.toLowerCase())
     );
     this.updatePaginatedTodos();
@@ -92,37 +86,10 @@ export class TodoListComponent {
     const start = this.currentPage * this.itemsPerPage;
     const end = start + this.itemsPerPage;
     this.paginatedTodos = this.filteredTodos.slice(start, end);
-  }
-
-  private resetEditState() {
-    this.isEditing = false;
-    this.editTodoIndex = null;
-    this.editTodoText = '';
-  }
-
-  private refreshTodos() {
-    this.updateFilteredTodos();
-    this.updatePaginatedTodos();
-    this.searchTodos();
-  }
-
-  onClickOutside(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (
-      (this.isEditing && !target.closest('.edit-todo-item')) ||
-      (this.isConfirmDialogOpen && !target.closest('.confirm-dialog'))
-    ) {
-      this.resetEditState();
-      this.closeConfirmDialog();
-    }
-  }
-
-  addTodo() {
-    if (this.newTodo.trim()) {
-      this.todos.unshift({ text: this.newTodo, done: false });
-      this.newTodo = '';
-      this.refreshTodos();
-      this.closeConfirmDialog();
+    if (this.paginatedTodos !== null || this.paginatedTodos !== undefined) {
+      setTimeout(() => {
+        this.isLoading$.next(false);
+      }, 1000);
     }
   }
 
@@ -136,58 +103,83 @@ export class TodoListComponent {
     this.todoIndexToDelete = null;
   }
 
-  removeTodo(index: number) {
-    this.todos.splice(index, 1);
-    this.refreshTodos();
-  }
-
   confirmDelete() {
     if (this.todoIndexToDelete !== null) {
-      this.removeTodo(this.todoIndexToDelete);
+      const todoToRemove = this.filteredTodos[this.todoIndexToDelete];
+      this.store.dispatch(deleteTodo({ id: todoToRemove.id }));
       this.closeConfirmDialog();
     }
   }
 
-  toggleDone(index: number) {
-    this.todos[index].done = !this.todos[index].done;
+  generateTodoId() {
+    const array = new Uint8Array(16);
+    window.crypto.getRandomValues(array);
+    const id = Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
+    return id;
+  }
+
+  private resetEditModal() {
+    this.isEditing = false;
+    this.editTodoIndex = null;
+    this.editTodoText = '';
+  }
+
+  public setTooltipValue(text: string): string {
+    return `Mark "${text}" as DONE`;
+  }
+
+  onClickOutside(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (
+      (this.isEditing && !target.closest('.edit-todo-item')) ||
+      (this.isConfirmDialogOpen && !target.closest('.confirm-dialog'))
+    ) {
+      this.resetEditModal();
+      this.closeConfirmDialog();
+    }
+  }
+
+  toggleDone(todo: ITodo) {
+    const updatedTodo = { ...todo, done: !todo.done };
+    this.store.dispatch(updateTodo({ todo: updatedTodo }));
   }
 
   openEditModal(index: number) {
     this.isEditing = true;
     this.editTodoIndex = index;
-    this.editTodoText = this.todos[index].text;
+    this.editTodoText = this.filteredTodos[index].text;
   }
 
   saveEdit() {
     if (this.editTodoIndex !== null) {
-      this.todos[this.editTodoIndex].text = this.editTodoText;
-      this.resetEditState();
-      this.refreshTodos();
+      const todo = this.filteredTodos[this.editTodoIndex];
+      const updatedTodo = { ...todo, text: this.editTodoText };
+      this.store.dispatch(updateTodo({ todo: updatedTodo }));
+      this.resetEditModal();
+      this.updateFilteredTodos();
     }
   }
 
   searchTodos() {
-    this.isLoading = true;
-    this.searchSubject.next(this.searchText);
+    this.isLoading$.next(true);
+    this.updateFilteredTodos(this.searchText);
   }
 
   onPageChange(event: any) {
     this.previousPage = this.currentPage;
     this.currentPage = event.page;
-
     if (this.currentPage > this.previousPage) {
       this.animationClass = 'slide-out-left';
     } else {
       this.animationClass = 'slide-out-right';
     }
-
     setTimeout(() => {
-      this.updatePaginatedTodos();
       if (this.currentPage > this.previousPage) {
         this.animationClass = 'slide-in-right';
       } else {
         this.animationClass = 'slide-in-left';
       }
-    }, 300);
+    }, 200);
+    this.updatePaginatedTodos();
   }
 }

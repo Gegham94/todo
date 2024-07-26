@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, of } from 'rxjs';
+import { IUser } from '../models/user.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private currentUserSubject: BehaviorSubject<any>;
-  public currentUser$: Observable<any>;
+  private currentUserSubject: BehaviorSubject<IUser | null>;
+  public currentUser$: Observable<IUser | null>;
 
   constructor() {
     const currentUser = JSON.parse(
       sessionStorage.getItem('currentUser') || 'null'
     );
-    this.currentUserSubject = new BehaviorSubject<any>(currentUser);
+    this.currentUserSubject = new BehaviorSubject<IUser | null>(currentUser);
     this.currentUser$ = this.currentUserSubject.asObservable();
   }
 
@@ -20,11 +21,11 @@ export class AuthService {
     email: string,
     password: string,
     confirmPassword: string
-  ): Observable<any> {
+  ): Observable<{success: boolean, user:IUser | null, msg:string}> {
     if (email && password && confirmPassword) {
       const newUser = { email, password };
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      if (users.find((user: any) => user.email === newUser.email)) {
+      if (users.find((user: IUser) => user.email === newUser.email)) {
         return of({ success: false, user: null, msg: 'User already exists' });
       }
       if (password !== confirmPassword) {
@@ -44,10 +45,10 @@ export class AuthService {
     }
   }
 
-  login(email: string, password: string): Observable<any> {
+  login(email: string, password: string): Observable<{success: boolean, user:IUser | null, msg:string}> {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find(
-      (user: any) => user.email === email && user.password === password
+      (user: IUser) => user.email === email && user.password === password
     );
     if (user) {
       sessionStorage.setItem('currentUser', JSON.stringify(user));
@@ -66,7 +67,7 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  getCurrentUser(): Observable<any> {
+  getCurrentUser(): Observable<IUser | null> {
     return this.currentUser$;
   }
 }

@@ -14,11 +14,12 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 2rem;
-    h2 {
+    .list-title {
       text-align: center;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: 600;
       color: #f07714;
+      margin-bottom: 2rem;
     }
     .add-wrapper {
       display: flex;
@@ -62,6 +63,9 @@
     border-radius: 0.4rem;
     box-shadow: 5px 5px 15px -5px #f07714;
     .list-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
       .search-wrapper {
         margin: 0.5rem 0.4rem;
         input {
@@ -155,6 +159,7 @@
             cursor: pointer;
             &.done {
               text-decoration: line-through;
+              font-style: italic;
               color: #f07714;
             }
           }
@@ -165,18 +170,26 @@
         &.slide-in-right {
           animation: slideInRight 0.1s forwards;
         }
-        
+
         &.slide-out-left {
           animation: slideOutLeft 0.1s forwards;
         }
-        
+
         &.slide-in-left {
           animation: slideInLeft 0.1s forwards;
         }
-        
+
         &.slide-out-right {
           animation: slideOutRight 0.1s forwards;
         }
+      }
+      .empty-list {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        color: #f07714;
+        flex: 1;
       }
     }
     .paginator-wrapper {
