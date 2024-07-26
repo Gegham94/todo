@@ -74,14 +74,6 @@ export class TodoListComponent implements OnInit {
     }
   }
 
-  private updateFilteredTodos(searchText?: string) {
-    const text = searchText !== undefined ? searchText : this.searchText;
-    this.filteredTodos = this.todos$.value.filter((todo) =>
-      todo.text.toLowerCase().includes(text.toLowerCase())
-    );
-    this.updatePaginatedTodos();
-  }
-
   private updatePaginatedTodos() {
     const start = this.currentPage * this.itemsPerPage;
     const end = start + this.itemsPerPage;
@@ -91,6 +83,13 @@ export class TodoListComponent implements OnInit {
         this.isLoading$.next(false);
       }, 1000);
     }
+  }
+
+  updateFilteredTodos() {
+    this.filteredTodos = this.todos$.value.filter((todo) =>
+      todo.text.toLowerCase().includes(this.searchText.toLowerCase())
+    );
+    this.updatePaginatedTodos();
   }
 
   openConfirmDialog(index: number) {
@@ -158,11 +157,6 @@ export class TodoListComponent implements OnInit {
       this.resetEditModal();
       this.updateFilteredTodos();
     }
-  }
-
-  searchTodos() {
-    this.isLoading$.next(true);
-    this.updateFilteredTodos(this.searchText);
   }
 
   onPageChange(event: any) {

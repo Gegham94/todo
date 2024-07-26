@@ -8,8 +8,8 @@
   </div>
   <div class="list-wrapper">
     <div class="list-body">
-      <div class="search-wrapper p-float-label" *ngIf="paginatedTodos.length > 0">
-        <input id="search" type="text" [placeholder]="searchPlaceholder" (focus)="searchPlaceholder = ''" [(ngModel)]="searchText" (input)="searchTodos()"/>
+      <div class="search-wrapper p-float-label">
+        <input id="search" type="text" [placeholder]="searchPlaceholder" (focus)="searchPlaceholder = ''" [(ngModel)]="searchText" (input)="updateFilteredTodos()"/>
         <label for="search">Search Todo</label>
       </div>
       <div class="loader-wrapper" *ngIf="isLoading$ | async; else listModel">
