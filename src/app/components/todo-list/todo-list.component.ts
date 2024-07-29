@@ -65,7 +65,7 @@ export class TodoListComponent implements OnInit {
     if (this.newTodo.trim()) {
       const newTodo: ITodo = {
         id: this.generateTodoId(),
-        text: this.newTodo,
+        title: this.newTodo,
         done: false,
       };
       this.store.dispatch(addTodo({ todo: newTodo }));
@@ -87,7 +87,7 @@ export class TodoListComponent implements OnInit {
 
   updateFilteredTodos() {
     this.filteredTodos = this.todos$.value.filter((todo) =>
-      todo.text.toLowerCase().includes(this.searchText.toLowerCase())
+      todo.title.toLowerCase().includes(this.searchText.toLowerCase())
     );
     this.updatePaginatedTodos();
   }
@@ -146,7 +146,7 @@ export class TodoListComponent implements OnInit {
   openEditModal(index: number) {
     this.isEditing = true;
     this.editTodoIndex = index;
-    this.editTodoText = this.filteredTodos[index].text;
+    this.editTodoText = this.filteredTodos[index].title;
   }
 
   saveEdit() {

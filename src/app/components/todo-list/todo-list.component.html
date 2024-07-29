@@ -21,9 +21,9 @@
             <input 
               type="text" 
               pInputText 
-              [pTooltip]="setTooltipValue(todo.text)"
+              [pTooltip]="setTooltipValue(todo.title)"
               (click)="toggleDone(todo)"
-              [value]="todo.text"
+              [value]="todo.title"
               [class.done]="todo.done"
               tooltipPosition="top" 
               placeholder="Top" 

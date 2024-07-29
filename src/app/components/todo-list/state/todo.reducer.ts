@@ -17,7 +17,12 @@ export const todoReducer = createReducer(
   initialState,
   on(TodoActions.loadTodos, (state) => ({ ...state, isLoading: true })),
   on(TodoActions.loadTodosSuccess, (state, { todos }) => adapter.setAll(todos, { ...state, isLoading: false })),
-  on(TodoActions.addTodo, (state, { todo }) => adapter.addOne(todo, state)),
+  on(TodoActions.addTodo, (state, { todo }) => {
+    const newState = adapter.addOne(todo, state);
+    const allIds = newState.ids as string[];
+    const newIds = [todo.id, ...allIds.filter(id => id !== todo.id)];
+    return { ...newState, ids: newIds };
+  }),
   on(TodoActions.deleteTodo, (state, { id }) => adapter.removeOne(id, state)),
   on(TodoActions.updateTodo, (state, { todo }) => adapter.updateOne({ id: todo.id, changes: todo }, state)),
 );
