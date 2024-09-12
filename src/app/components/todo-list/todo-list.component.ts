@@ -152,7 +152,7 @@ export class TodoListComponent implements OnInit {
   saveEdit() {
     if (this.editTodoIndex !== null) {
       const todo = this.filteredTodos[this.editTodoIndex];
-      const updatedTodo = { ...todo, text: this.editTodoText };
+      const updatedTodo = { ...todo, title: this.editTodoText };
       this.store.dispatch(updateTodo({ todo: updatedTodo }));
       this.resetEditModal();
       this.updateFilteredTodos();

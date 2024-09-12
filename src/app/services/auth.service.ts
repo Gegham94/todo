@@ -23,9 +23,8 @@ export class AuthService {
     confirmPassword: string
   ): Observable<{success: boolean, user:IUser | null, msg:string}> {
     if (email && password && confirmPassword) {
-      const newUser = { email, password };
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      if (users.find((user: IUser) => user.email === newUser.email)) {
+      if (users.find((user: IUser) => user.email === email)) {
         return of({ success: false, user: null, msg: 'User already exists' });
       }
       if (password !== confirmPassword) {
@@ -35,6 +34,7 @@ export class AuthService {
           msg: 'Passwords do not match',
         });
       }
+      const newUser = { id: users.length, email, password };
       users.push(newUser);
       localStorage.setItem('users', JSON.stringify(users));
       sessionStorage.setItem('currentUser', JSON.stringify(newUser));
@@ -69,5 +69,9 @@ export class AuthService {
 
   getCurrentUser(): Observable<IUser | null> {
     return this.currentUser$;
+  }
+
+  getCurrentUserSync(): IUser | null {
+    return this.currentUserSubject.value;
   }
 }
